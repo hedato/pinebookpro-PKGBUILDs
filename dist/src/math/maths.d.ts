@@ -29,4 +29,6 @@ export declare namespace Maths {
         function fill(tensor: Tensor, fillValue: ((row?: number, column?: number) => number) | number): number[][];
         function getSize(t: Tensor): number[];
         function isValid(t: Tensor): boolean;
-        function apply(t: Tensor, f
+        function apply(t: Tensor, func: (value?: number, row?: number, col?: number) => number): number[][];
+    }
+}
