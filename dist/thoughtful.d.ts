@@ -87,4 +87,84 @@ export namespace Maths {
           */
         function generate(size: number[], fillValue?: ((row?: number, column?: number) => number) | number): number[][];
         function fill(tensor: Tensor, fillValue: ((row?: number, column?: number) => number) | number): number[][];
-        function getSize(t: Tensor): num
+        function getSize(t: Tensor): number[];
+        function isValid(t: Tensor): boolean;
+        function apply(t: Tensor, func: (value?: number, row?: number, col?: number) => number): number[][];
+    }
+}
+
+export class Vector {
+    constructor(components: number[]);
+    static rand(size: number): Vector;
+    copy(): Vector;
+    getArray(): number[];
+    append(vec: Vector): this;
+    prepend(vec: Vector): this;
+    readonly size: number;
+    readonly magnitude: number;
+    get(component: number): number;
+    set(component: number, value: number): this;
+    add(vec: Vector): this;
+    subtract(vec: Vector): this;
+    multiply(vec: Vector): this;
+    divide(vec: Vector): this;
+    pow(exponent: number): this;
+    sum(): number;
+    scale(scl: number): this;
+    /**
+      * this vector will be a row vector
+      * @param vec column vector
+      */
+    dot(vec: Vector): number;
+    apply(func: (number) => number): this;
+}
+
+export interface ANNOptions {
+        learningRate: number;
+        layers: number[];
+        activationFunction: ActivationFunction;
+        errorFunction: ErrorFunction;
+        momentum: number;
+}
+export class FeedForwardNeuralNetwork {
+        constructor(options: ANNOptions);
+        /**
+            * Creates new network with specified weights
+            * @param weightData previously saved weights (using Network.exportWeights)
+            * @param options network options
+            */
+        static restore(weightData: number[][][], options: ANNOptions): FeedForwardNeuralNetwork;
+        /**
+            * Fits given inputs to given target values by training the network
+            * @param inputs inputs to the network
+            * @param targetValues expected outputs for given input
+            */
+        fit(inputs: number[], targetValues: number[]): this;
+        /**
+            * Predict output values for given inputs
+            * @param inputs input values
+            */
+        predict(inputs: number[]): number[];
+        /**
+            * Calculate the error for current outputs (not forward pass)
+            * @param targetValues target values
+            */
+        getCurrentError(targetValues: number[]): number;
+        /**
+            * Calculates the error for given inputs
+            * @param inputs inputs to network
+            * @param targetValues expected output for given inputs
+            */
+        error(inputs: number[], targetValues: number[]): number;
+        /**
+            * Export the current weights of the network
+            */
+        exportWeights(): number[][][];
+}
+
+export interface ActivationFunction {
+    output: (input: number) => number;
+    der: (input: number) => number;
+}
+export class Activations {
+    static
