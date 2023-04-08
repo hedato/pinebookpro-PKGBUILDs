@@ -167,4 +167,84 @@ export interface ActivationFunction {
     der: (input: number) => number;
 }
 export class Activations {
-    static
+    static TANH: ActivationFunction;
+    static SIGMOID: ActivationFunction;
+    static RELU: ActivationFunction;
+    static LINEAR: ActivationFunction;
+}
+
+export interface ErrorFunction {
+    error: (output: number, target: number) => number;
+    der: (output: number, target: number) => number;
+}
+export class Errors {
+    static SQUARE: ErrorFunction;
+    static CROSS_ENTROPY: ErrorFunction;
+}
+
+export class ANN {
+    constructor(options: {
+        size: number[];
+        activation: ActivationFunction;
+        error: ErrorFunction;
+        learningRate: number;
+        momentum?: number;
+    });
+    cost(output: Maths.Vector, target: Maths.Vector): number;
+    backward(target: Maths.Vector): number[][][];
+    calculateGradients(deltas?: Maths.Vector[]): number[][][];
+    updateWeightsAndBiases(gradients?: Maths.Vector[], deltas?: Maths.Vector[]): void;
+    forward(input: Maths.Vector): number[][];
+}
+
+export namespace Utilities {
+    function repeat(func: (iterations?: number) => any, iterations: number): void;
+    function csvStringToJSON(csv: string, tryObjectParseIfPossible?: boolean, columnSeparator?: string, rowSeparator?: string): {}[] | (string | number)[][];
+    function pickRandomFromArray(array: any[]): any;
+    function tokenize(str: string, exp?: RegExp): string[];
+}
+
+export class LabelToValue {
+    toValue(label: string): number;
+    toLabel(value: number): string;
+}
+
+export namespace Generators {
+    function clouds(clouds: number, dataPointsForCloud?: number, dimensions?: number, min?: number, max?: number, spread?: number): {
+        center: number[];
+        points: number[][];
+    }[];
+}
+
+export class KNNClassifier {
+    constructor(k?: number, distanceFunction?: NumericDistanceFunction);
+    addData(classes: number[], data: number[][]): this;
+    predict(input: number[], l2v?: LabelToValue): string | number;
+}
+
+export class KMeans {
+    constructor(data: number[][], numberOfClusters: any);
+    fitClusters(distanceFunction?: NumericDistanceFunction): number[][];
+}
+
+export class NaiveBayesClassifier {
+    /**
+      * words = {
+      *  "word1": {
+      *     "label1": count
+      *     "label2": count
+      *  }
+      *  "word2": {
+      *     "label1": count
+      *     "label2": count
+      *  }
+      * }
+      */
+    words: {};
+    docs: {};
+    labels: string[];
+    constructor(tokenizeMethod?: (string) => string[]);
+    add(text: string, _label: number | string): void;
+    classify(text: string): string;
+}
+
