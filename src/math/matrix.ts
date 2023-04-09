@@ -107,4 +107,87 @@ export class Matrix{
     }
 
     public getAsScalar(){
+        if(this.getDimensions().every(d => d == 1)){
+            return this.get(0, 0);
+        }else{
+            this.error('size', 'getAsFloat (matrix must be 1x1)');
+        }
+    }
+
+    public getArray(){
+        // Deep copy without reference
+        return this.data.map(r => r.slice());
+    }
+
+    public copy(){
+        return new Matrix(this.getArray());
+    }
+
+    // endRow and endColumn exclusive if positive
+    // startRow and startColumn exclusive if negative
+    public slice(startRow: number, endRow: number, startColumn: number, endColumn: number){
+        //Handle negatives
+
+        if(endRow < 0){
+            endRow = this.getNumberOfRows() + (endRow + 1);
+        }
+        if(startRow < 0){
+            startRow = this.getNumberOfRows() + (startRow + 1);
+        }
+
+        if(endColumn < 0){
+            endColumn = this.getNumberOfColumns() + (endColumn + 1);
+        }
+        if(startColumn < 0){
+            startColumn = this.getNumberOfColumns() + (startColumn + 1);
+        }
+
+        let res = new Matrix(endRow - startRow, endColumn - startColumn);
+        for(let row = startRow; row < endRow; row++){
+            for(let column = startColumn; column < endColumn; column++){
+                res.set(row-startRow, column-startColumn, this.get(row, column));
+            }
+        }
+
+        return res;
+    }
+
+    public map(func: (val: number, row?: number, column?: number) => number){
+        for(let i = 0; i < this.getNumberOfRows(); i++){
+            for(let j = 0; j < this.getNumberOfColumns(); j++){
+                this.data[i][j] = func(this.data[i][j], i, j);
+            }
+        }
+        return this;
+    }
+
+    public forEach(func: (val: number, row?: number, column?: number) => void){
+        for(let i = 0; i < this.getNumberOfRows(); i++){
+            for(let j = 0; j < this.getNumberOfColumns(); j++){
+                func(this.data[i][j], i, j);
+            }
+        }
+        return this;
+    }
+
+    public fill(newVal: number){
+        return this.map(v => newVal);
+    }
+
+    public scale(scl: number){
+        return this.map(v => v*scl);
+    }
+
+    public add(tensor: Matrix){
+        let m = this.transformVectorToMatrix(tensor);
+        if(!this.hasSameDimensions(m)) this.error('size', 'addition');
+        return this.map((v, row, col) => v + m.get(row, col));
+    }
+
+    public subtract(tensor: Matrix | Vector){
+        let m = this.transformVectorToMatrix(tensor);
+        if(!this.hasSameDimensions(m)) this.error('size', 'subtraction');
+        return this.map((v, row, col) => v - m.get(row, col));
+    }
+    public multiply(tensor: Matrix | Vector){
    
