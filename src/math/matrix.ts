@@ -274,4 +274,31 @@ export class Matrix{
         
     }
 
-    public
+    public show(){
+        console.log(this.getAsString());
+        return this;
+    }
+
+    public getAsString(markup = true, joinChar = '\t', lineSpaceChar = ' ', end = '\n', fixed = 3) {
+        if (!markup) {
+            return this.data.map(r => r.map(n => n.toFixed(fixed)).join('\t')).join('\n') + end;
+        } else {
+            return this.data.map((r, i) => {
+
+                let middlePart = r.map(n => n.toFixed(fixed)).join(joinChar)
+
+
+                if (i == 0 && this.data.length == 1) {
+                    return `[${lineSpaceChar}${middlePart}${lineSpaceChar}]`
+                } else if (i == 0) {
+                    return `⎡${lineSpaceChar}${middlePart}${lineSpaceChar}⎤`
+                } else if (i == this.data.length - 1) {
+                    return `⎣${lineSpaceChar}${middlePart}${lineSpaceChar}⎦`
+                } else {
+                    return `⎜${lineSpaceChar}${middlePart}${lineSpaceChar}⎟`
+                }
+            }).join('\n') + end;
+        }
+    }
+
+}
