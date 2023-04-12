@@ -190,4 +190,88 @@ export class Matrix{
         return this.map((v, row, col) => v - m.get(row, col));
     }
     public multiply(tensor: Matrix | Vector){
-   
+        let m = this.transformVectorToMatrix(tensor);
+        if(!this.hasSameDimensions(m)) this.error('size', 'multiplication');
+        return this.map((v, row, col) => v * m.get(row, col));
+    }
+    public divide(tensor: Matrix | Vector){
+        let m = this.transformVectorToMatrix(tensor);
+        if(!this.hasSameDimensions(m)) this.error('size', 'division');
+        return this.map((v, row, col) => v / m.get(row, col));
+    }
+
+    
+
+    public dot(tensor: Matrix | Vector){
+
+        let m = this.transformVectorToMatrix(tensor);
+        if(!(this.getNumberOfColumns() == m.getNumberOfRows())) this.error('size', 'dot product');
+
+        let newData = Matrix.get2DArray(this.getNumberOfRows(), m.getNumberOfColumns());
+
+        for(let v = 0; v < m.getNumberOfColumns(); v++){
+            for(let r = 0; r < this.getNumberOfRows(); r++){
+                for(let i = 0; i < m.getNumberOfRows(); i++){
+                    newData[r][v] += m.get(i, v) * this.get(r, i);
+                }
+            }
+        }
+
+        this.data = newData;
+        return this;
+    }
+
+    private transformVectorToMatrix(tentativeVec: Vector | Matrix): Matrix{
+        return tentativeVec instanceof Matrix ? tentativeVec :  Matrix.columnVector(...tentativeVec.getArray());
+    }
+
+    public getVector(){
+
+    }
+
+    public transpose(){
+        let newData = Matrix.get2DArray(this.getNumberOfColumns(), this.getNumberOfRows());
+        this.forEach((v, row, col) => {
+            newData[col][row] = v;
+        });
+        this.data = newData;
+        return this;
+    }
+
+    public min(){
+        let minValues = [];
+        for(let c = 0; c < this.getNumberOfColumns(); c++){
+            let column = this.getColumnAsRowVector(c).getArray()[0];
+            minValues.push(Math.min(...column));
+        }
+
+        return Matrix.rowVector(...minValues);
+    }
+    public max(){
+        let maxValues = [];
+        for(let c = 0; c < this.getNumberOfColumns(); c++){
+            let column = this.getColumnAsRowVector(c).getArray()[0];
+            maxValues.push(Math.max(...column));
+        }
+
+        return Matrix.rowVector(...maxValues);
+    }
+
+    private hasSameDimensions(m: Matrix){
+        if(m.getNumberOfColumns() == this.getNumberOfColumns() && m.getNumberOfRows() == this.getNumberOfRows()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    private error(code: 'size', operation: string){
+        switch (code) {
+            case 'size':
+                throw `Matrices not not have the right sizes for operation ${operation}`;        
+            default:
+                throw "Error!"
+        }
+        
+    }
+
+    public
