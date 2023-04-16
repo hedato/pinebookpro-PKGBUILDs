@@ -63,4 +63,36 @@ export class Vector{
         return this;
     }
     public pow(exponent: number ){
-       
+        
+        this.components.map((c, i) => Math.pow(c, exponent));
+        return this;
+    }
+
+    public sum(){
+        return Maths.sum(this.components);
+    }
+
+    public scale(scl: number){
+        this.components.map(c => c * scl);
+        return this;
+    }
+
+    /**
+     * this vector will be a row vector
+     * @param vec column vector
+     */
+    public dot(vec: Vector){
+        let val = 0;
+        this.assertSameSize(vec);
+        return Maths.sum(this.components.map((c, i) => c * vec.get(i)));
+    }
+
+    public apply(func: (number) => number){
+        this.components = this.components.map(c => func(c));
+        return this;
+    }
+
+    private assertSameSize(vec: Vector){
+        if(this.size != vec.size) new Error('Vectors do not have matching sizes');
+    }
+}
